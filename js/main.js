@@ -1,7 +1,7 @@
 BOARD = {};
 
 BOARD.initBoard = function (){
-  var boardSize = document.getElementById('board-size').value;
+  var boardSize = 8;
 
   BOARD.generateBoard(boardSize);
 }
