@@ -26,6 +26,12 @@ BOARD.generateBoard = function(boardSize) {
       case 2:
         boardElement.classList.add('two-ship');
         break;
+	case 3:
+	 boardElement.classList.add('three-ship');
+	 break;
+	case 4:
+	 boardElement.classList.add('four-ship');
+	 break;
       default:
 
     }
@@ -34,12 +40,14 @@ BOARD.generateBoard = function(boardSize) {
 BOARD.delayIncrement = 5;
 BOARD.delay = 200;
 BOARD.turn = 0;
-BOARD.tsum = 6;
-BOARD.osum = 3;
-BOARD.thsum = 1;
+BOARD.tsum = 3;
+BOARD.osum = 4;
+BOARD.thsum = 2;
+BOARD.fsum = 1;
 BOARD.ocounter = 0;
 BOARD.tcounter = 0;
 BOARD.thcounter = 0;
+BOARD.fcounter = 0;
 BOARD.badShotsCounter = 0;
 BOARD.shipMap = shipMap;
 BOARD.initAI(boardSize);
@@ -86,13 +94,18 @@ BOARD.startAI = function(shotMap, boardSize, possibleShots){
 	  startIndex = possibleShots[random];
 	  possibleShots.splice(random, 1);
   }else{
+	   if (BOARD.ocounter == BOARD.osum && BOARD.tcounter == (BOARD.tsum * 2) && BOARD.thcounter == (BOARD.thsum *3) && BOARD.fcounter == (BOARD.fsum * 4)) {
+	   }else{
 	  console.log("GENERATING RANDOM");
 	  startIndex = BOARD.generateStartIndex(boardSize, shotMap);
+  	}
   }
   var arrayIndex = BOARD.checkIfArrayIsFull(shotMap);
 
- if (BOARD.ocounter == BOARD.osum && BOARD.tcounter == (BOARD.tsum * 2) && BOARD.thcounter == (BOARD.thsum *3)) {
+ if (BOARD.ocounter == BOARD.osum && BOARD.tcounter == (BOARD.tsum * 2) && BOARD.thcounter == (BOARD.thsum *3) && BOARD.fcounter == (BOARD.fsum * 4) ) {
 	  console.log(BOARD.turn + " " + BOARD.ocounter + " " + BOARD.tcounter);
+	 var log = document.getElementById('log-info');
+	 log.innerHTML = "Ėjimų skaičius : " + BOARD.turn;
 	 BOARD.endGame();
  }else if ( shotMap[startIndex] != null) {
  	BOARD.startAI(shotMap, boardSize, possibleShots);
@@ -117,6 +130,7 @@ BOARD.startAI = function(shotMap, boardSize, possibleShots){
     }else if (shotResult == 2) {
 	BOARD.tcounter += 1;
       shotMap[startIndex] = shotResult;
+
       if ((startIndex-1 >= 0 ) && (startIndex % boardSize != 0)&& (shotMap[startIndex-2] == 0 || shotMap[startIndex-2] == -1 || shotMap[startIndex-2] == null)) {
 		if(shotMap[startIndex-1] == 0 || shotMap[startIndex-1] == -1 || shotMap[startIndex-1] == null)
 		{
@@ -147,62 +161,19 @@ BOARD.startAI = function(shotMap, boardSize, possibleShots){
       }
 
       document.getElementById(startIndex).classList.add('two-ship');
+
+	if(shotMap[startIndex +1] == 2 || shotMap[startIndex -1] == 2 || shotMap[startIndex - boardSize] ==2 || shotMap[+startIndex + +boardSize] == 2)
+	{
+		possibleShots = [];
+	}
+
       setTimeout(function(){BOARD.startAI(shotMap, boardSize, possibleShots);}, BOARD.delay);
 }else if (shotResult == 3) {
 	BOARD.thcounter += 1;
       shotMap[startIndex] = shotResult;
-	if(shotMap[startIndex +1] == 3){
-		if ((startIndex % boardSize)> 0) {
-			possibleShots.push(startIndex -1);
-			console.log("tiple shot left +1");
-		}
-
-		if(startIndex +1 < (Math.pow(boardSize, 2) -1)) {
-			possibleShots.push(startIndex +2);
-			console.log("tiple shot right +1");
-		}
-	}
-
-	if(shotMap[startIndex -1] == 3){
-		if (startIndex <  (Math.pow(boardSize, 2) -1)) {
-			possibleShots.push(startIndex +1);
-			console.log("tiple shot left -1");
-		}
-
-		if (((startIndex -1) % boardSize) > 0) {
-			possibleShots.push(startIndex -2);
-			console.log("tiple shot right -1");
-		}
-	}
-
-	if(shotMap[+startIndex + +boardSize] == 3){
-		if (startIndex - boardSize  > 0) {
-			possibleShots.push(startIndex - boardSize);
-			console.log("tiple shot down -8");
-		}
-
-		if(+startIndex + +boardSize  < (Math.pow(boardSize, 2) -1)) {
-			possibleShots.push(+startIndex + +(boardSize*2));
-			console.log("tiple shot up -8");
-		}
-	}
-
-	if(shotMap[startIndex - boardSize] == 3){
-		if (+startIndex + +boardSize <  (Math.pow(boardSize, 2) -1)) {
-			possibleShots.push(+startIndex + +boardSize);
-			console.log("tiple shot up +8");
-		}
-
-		if (startIndex - (boardSize * 2) > 0) {
-			possibleShots.push(startIndex - (boardSize * 2));
-			console.log("tiple shot down +8");
-		}
-	}
-
 	document.getElementById(startIndex).classList.add('three-ship');
 	//setTimeout(function(){BOARD.startAI(shotMap, boardSize, possibleShots);}, BOARD.delay);
-
-      if ((startIndex-1 >= 0 ) && (startIndex % boardSize != 0)&& (shotMap[startIndex-2] == 0 || shotMap[startIndex-2] == -1 || shotMap[startIndex-2] == null)) {
+      if ((startIndex-1 >= 0 ) && (startIndex % boardSize != 0)&& (shotMap[startIndex-2] == 0 || shotMap[startIndex-2] == -1 || shotMap[startIndex-2] == null || shotMap[startIndex-2] == 3)) {
 		if(shotMap[startIndex-1] == 0 || shotMap[startIndex-1] == -1 || shotMap[startIndex-1] == null)
 		{
 			possibleShots.push(startIndex-1);
@@ -210,21 +181,21 @@ BOARD.startAI = function(shotMap, boardSize, possibleShots){
 		}
       }
 
-      if (startIndex+1 < (Math.pow(boardSize, 2)-1) && (shotMap[startIndex+2] == 0 || shotMap[startIndex+2] == -1 || shotMap[startIndex-2] == null)) {
+      if (startIndex+1 < (Math.pow(boardSize, 2)) && (shotMap[startIndex+2] == 0 || shotMap[startIndex+2] == -1 || shotMap[startIndex-2] == null || shotMap[startIndex-2] == 3)) {
 		if (shotMap[startIndex+1] == 0 || shotMap[startIndex+1] == -1 ||  shotMap[startIndex+1] == null) {
 			possibleShots.push(startIndex+1);
 			console.log("+1");
 		}
       }
 
-      if (startIndex - boardSize >= 0 && (shotMap[startIndex - (boardSize * 2)] == 0 || shotMap[startIndex - (boardSize * 2)] == -1 || shotMap[startIndex-(boardSize * 2)] == null)) {
+      if (startIndex - boardSize >= 0 && (shotMap[startIndex - (boardSize * 2)] == 0 || shotMap[startIndex - (boardSize * 2)] == -1 || shotMap[startIndex-(boardSize * 2)] == null || shotMap[startIndex-(boardSize * 2)] == 3)) {
 		if ((startIndex - boardSize) >= 0 &&  shotMap[startIndex-boardSize] == 0 || shotMap[startIndex-boardSize] == -1 || shotMap[startIndex-boardSize] == null) {
 			possibleShots.push(startIndex - boardSize);
 			console.log("-8");
 		}
       }
 
-      if (+startIndex + +boardSize <=  Math.pow(boardSize, 2) && (shotMap[+startIndex +(boardSize * 2)] == 0 || shotMap[+startIndex +(boardSize * 2)] == -1 || shotMap[+startIndex+(boardSize * 2)] == null)) {
+      if (+startIndex + +boardSize <=  Math.pow(boardSize, 2) && (shotMap[+startIndex +(boardSize * 2)] == 0 || shotMap[+startIndex +(boardSize * 2)] == -1 || shotMap[+startIndex+(boardSize * 2)] == null || shotMap[+startIndex+(boardSize * 2)] == 3)) {
 		if (((+startIndex + +boardSize) < Math.pow(boardSize, 2) - 1) && (shotMap[+startIndex + +boardSize] == 0 || shotMap[+startIndex + +boardSize] == -1 || shotMap[+startIndex + +boardSize] == null)) {
 			if (startIndex == 0) {
 				possibleShots.push(8);
@@ -234,7 +205,186 @@ BOARD.startAI = function(shotMap, boardSize, possibleShots){
 			console.log("+8");
 		}
       }
+	if(shotMap[startIndex +1] == 3){
+		possibleShots = [];
+		if ((startIndex % boardSize)> 0) {
+			possibleShots.push(startIndex -1);
+		}
+
+		if(startIndex +1 < (Math.pow(boardSize, 2))) {
+			possibleShots.push(startIndex +2);
+		}
+	}
+
+	if(shotMap[startIndex -1] == 3){
+		if (startIndex <  (Math.pow(boardSize, 2) )) {
+			possibleShots.push(startIndex +1);
+		}
+
+		if (((startIndex -1) % boardSize) > 0) {
+			possibleShots.push(startIndex -2);
+		}
+	}
+
+	if(shotMap[+startIndex + +boardSize] == 3){
+		possibleShots = [];
+		if (startIndex - boardSize  > 0) {
+			possibleShots.push(startIndex - boardSize);
+		}
+
+		if(+startIndex +  +(boardSize *2) < (Math.pow(boardSize, 2) -1)) {
+			possibleShots.push(+startIndex + +(boardSize*2));
+		}
+	}
+
+	if(shotMap[startIndex - boardSize] == 3){
+		if ((+startIndex + +boardSize) <  (Math.pow(boardSize, 2) -1)) {
+			possibleShots.push(+startIndex + +boardSize);
+		}
+
+		if (startIndex - (boardSize * 2) > 0) {
+			possibleShots.push(startIndex - (boardSize * 2));
+		}
+	}
+
+	if((shotMap[startIndex +1] == 3 &&  shotMap[startIndex -1] == 3 ) || (shotMap[startIndex -1] == 3 &&  shotMap[startIndex -2] == 3 ) || (shotMap[startIndex +1] == 3 &&  shotMap[startIndex +2] == 3 ))
+	{
+		possibleShots = [];
+	}
+	if((shotMap[+startIndex + +boardSize] == 3 &&  shotMap[startIndex -boardSize] == 3 ) || (shotMap[startIndex - boardSize] == 3 &&  shotMap[startIndex - (boardSize*2)] == 3 ) || (shotMap[+startIndex + +boardSize] == 3 &&  shotMap[+startIndex + +(boardSize*2)] == 3 ))
+	{
+		possibleShots = [];
+	}
 	console.log("SHOT THREE");
+      setTimeout(function(){BOARD.startAI(shotMap, boardSize, possibleShots);}, BOARD.delay);
+}else if (shotResult == 4) {
+	BOARD.fcounter += 1;
+      shotMap[startIndex] = shotResult;
+	console.log("SHOT FOUR START");
+	if(shotMap[startIndex +2] == 4)
+	{
+		if((startIndex-1) % boardSize != 0){
+			possibleShots.push(startIndex-1);
+		}
+		if ((startIndex+2 ) % boardSize != 7) {
+			possibleShots.push(startIndex+3);
+		}
+	}
+
+	if(shotMap[startIndex - 2] == 4)
+	{
+		if((startIndex) % boardSize != 7){
+			possibleShots.push(startIndex+1);
+		}
+		if ((startIndex-2 ) % boardSize != 0) {
+			possibleShots.push(startIndex-3);
+		}
+	}
+
+	if(shotMap[+startIndex + +(boardSize * 2)] == 4)
+	{
+		if((startIndex - boardSize) >= 0){
+			possibleShots.push(startIndex-boardSize);
+		}
+		if ((+startIndex+ +(boardSize * 3) ) < Math.pow(boardSize, 2)) {
+			possibleShots.push(+startIndex+ +(boardSize * 3));
+		}
+	}
+
+	if(shotMap[startIndex - (boardSize * 2)] == 4)
+	{
+		if((+startIndex + +boardSize) < Math.pow(boardSize, 2)){
+			possibleShots.push(+startIndex+ +boardSize);
+		}
+		if ((startIndex - (boardSize * 3) ) >= 0) {
+			possibleShots.push(startIndex -  (boardSize * 3));
+		}
+	}
+
+		if(shotMap[startIndex +1] == 4){
+			if ((startIndex % boardSize)> 0) {
+				possibleShots.push(startIndex -1);
+			}
+
+			if(startIndex +1 < (Math.pow(boardSize, 2))) {
+				possibleShots.push(startIndex +2);
+			}
+		}
+
+		if(shotMap[startIndex -1] == 4){
+			if (startIndex <  (Math.pow(boardSize, 2) )) {
+				possibleShots.push(startIndex +1);
+			}
+
+			if (((startIndex -1) % boardSize) > 0) {
+				possibleShots.push(startIndex -2);
+			}
+		}
+
+		if(shotMap[+startIndex + +boardSize] == 4){
+			if (startIndex - boardSize  > 0) {
+				possibleShots.push(startIndex - boardSize);
+			}
+
+			if(+startIndex +  +(boardSize *2) < (Math.pow(boardSize, 2) -1)) {
+				possibleShots.push(+startIndex + +(boardSize*2));
+			}
+		}
+
+		if(shotMap[startIndex - boardSize] == 4){
+			if ((+startIndex + +boardSize) <  (Math.pow(boardSize, 2) -1)) {
+				possibleShots.push(+startIndex + +boardSize);
+			}
+
+			if (startIndex - (boardSize * 2) > 0) {
+				possibleShots.push(startIndex - (boardSize * 2));
+			}
+		}
+
+	document.getElementById(startIndex).classList.add('four-ship');
+	//setTimeout(function(){BOARD.startAI(shotMap, boardSize, possibleShots);}, BOARD.delay);
+	      if ((startIndex-1 >= 0 ) && (startIndex % boardSize != 0)&& (shotMap[startIndex-2] == 0 || shotMap[startIndex-2] == -1 || shotMap[startIndex-2] == null)) {
+			if(shotMap[startIndex-1] == 0 || shotMap[startIndex-1] == -1 || shotMap[startIndex-1] == null)
+			{
+				possibleShots.push(startIndex-1);
+				console.log("-1");
+			}
+	      }
+
+	      if (startIndex+1 < (Math.pow(boardSize, 2)-1) && (shotMap[startIndex+2] == 0 || shotMap[startIndex+2] == -1 || shotMap[startIndex-2] == null)) {
+			if (shotMap[startIndex+1] == 0 || shotMap[startIndex+1] == -1 ||  shotMap[startIndex+1] == null) {
+				possibleShots.push(startIndex+1);
+				console.log("+1");
+			}
+	      }
+
+	      if (startIndex - boardSize >= 0 && (shotMap[startIndex - (boardSize * 2)] == 0 || shotMap[startIndex - (boardSize * 2)] == -1 || shotMap[startIndex-(boardSize * 2)] == null)) {
+			if ((startIndex - boardSize) >= 0 &&  shotMap[startIndex-boardSize] == 0 || shotMap[startIndex-boardSize] == -1 || shotMap[startIndex-boardSize] == null) {
+				possibleShots.push(startIndex - boardSize);
+				console.log("-8");
+			}
+	      }
+
+	      if (+startIndex + +boardSize <=  Math.pow(boardSize, 2) && (shotMap[+startIndex +(boardSize * 2)] == 0 || shotMap[+startIndex +(boardSize * 2)] == -1 || shotMap[+startIndex+(boardSize * 2)] == null)) {
+			if (((+startIndex + +boardSize) < Math.pow(boardSize, 2) - 1) && (shotMap[+startIndex + +boardSize] == 0 || shotMap[+startIndex + +boardSize] == -1 || shotMap[+startIndex + +boardSize] == null)) {
+				if (startIndex == 0) {
+					possibleShots.push(8);
+				}else{
+					possibleShots.push(+startIndex +  +boardSize);
+				}
+				console.log("+8");
+			}
+	      }
+		if((shotMap[startIndex +1] == 4 &&  shotMap[startIndex + 2] == 4 && shotMap[startIndex +3] == 4) || (shotMap[startIndex -1] == 4 &&  shotMap[startIndex + 1] == 4 && shotMap[startIndex + 2] == 4) || (shotMap[startIndex -2] == 4 &&  shotMap[startIndex -1] == 4 && shotMap[startIndex +1] == 4) || (shotMap[startIndex - 1] == 4 &&  shotMap[startIndex - 2] == 4 && shotMap[startIndex -3] == 4)   )
+		{
+			possibleShots = [];
+		}
+
+		if((shotMap[+startIndex + +boardSize] == 4 &&  shotMap[+startIndex + +(boardSize*2)] == 4 && shotMap[+startIndex + +(boardSize * 3)] == 4) || (shotMap[startIndex - boardSize] == 4 &&  shotMap[startIndex + boardSize] == 4 && shotMap[+startIndex + +(boardSize * 2)] == 4) || (shotMap[startIndex - (boardSize*2)] == 4 &&  shotMap[startIndex - boardSize] == 4 && shotMap[+startIndex + +boardSize] == 4) || (shotMap[startIndex - boardSize] == 4 &&  shotMap[startIndex - (boardSize * 2)] == 4 && shotMap[startIndex - (boardSize * 3)] == 4)   )
+		{
+			possibleShots = [];
+		}
+	console.log("SHOT FOUR");
       setTimeout(function(){BOARD.startAI(shotMap, boardSize, possibleShots);}, BOARD.delay);
 }
   }
@@ -247,9 +397,12 @@ BOARD.takeTheShot = function(shotIndex) {
 
 BOARD.generateStartIndex = function(boardSize, shotMap) {
   var random =  Math.floor(Math.random() * Math.pow(boardSize,2));
-  while(shotMap[random] != null || shotMap[+random + 1] > 0 || shotMap[+random - 1]  > 0 || shotMap[+random + +boardSize] > 0 || shotMap[+random - +boardSize] > 0)
+  var i =  0
+  while(shotMap[random] != null || shotMap[+random + 1] > 0 || shotMap[+random - 1]  > 0 || shotMap[+random + +boardSize] > 0 || shotMap[+random - +boardSize] > 0 ||
+  shotMap[+random + +boardSize +1]  > 0 || shotMap[+random + +boardSize -1]  > 0 || shotMap[+random - +boardSize +1]  > 0 || shotMap[+random - +boardSize -1]  > 0 || i < 10)
   {
-	  console.log('CREATING NEW RANDOM NUMBER ');
+	console.log('CREATING NEW RANDOM NUMBER ');
+	i++;
 	random =  Math.floor(Math.random() * Math.pow(boardSize,2));
   }
 	  return random;
@@ -272,12 +425,12 @@ BOARD.generateShips = function(boardSize) {
     shipMap = [
 	2,2,0,1,0,0,0,0,
 	0,0,0,0,0,0,2,0,
-	1,0,2,2,0,0,2,0,
+	4,4,4,4,0,0,2,0,
 	0,0,0,0,0,0,0,0,
-	2,0,2,0,1,0,0,0,
-	2,0,2,0,0,0,0,0,
-	0,0,0,0,0,0,2,0,
-	3,3,3,0,0,0,2,0,
+	1,0,2,0,1,0,0,0,
+	0,0,2,0,0,0,3,0,
+	0,0,0,0,1,0,3,0,
+	3,3,3,0,0,0,3,0,
     ];
   }
   return shipMap;

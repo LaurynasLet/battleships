@@ -8,6 +8,9 @@ html, body {
 	width: 80%;
 	margin: 0 auto;
 }
+.log {
+	width: 100%;
+}
 .board-container {
 	width: 100%;
 	padding: 16px;
@@ -54,6 +57,9 @@ html, body {
 	background: green;
 }
 
-.three-ship{
+.three-ship {
 	background: purple;
+}
+.four-ship {
+	background: pink;
 }
