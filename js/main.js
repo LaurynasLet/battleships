@@ -38,7 +38,7 @@ BOARD.generateBoard = function(boardSize) {
     boardContainer.appendChild(boardElement);
   }
 BOARD.delayIncrement = 5;
-BOARD.delay = 200;
+BOARD.delay = 500;
 BOARD.turn = 0;
 BOARD.tsum = 3;
 BOARD.osum = 4;
@@ -93,11 +93,15 @@ BOARD.startAI = function(shotMap, boardSize, possibleShots){
 	  var random = Math.floor(Math.random() * possibleShots.length);
 	  startIndex = possibleShots[random];
 	  possibleShots.splice(random, 1);
+	  console.log("in possibleShots");
+	  console.log(startIndex);
   }else{
 	   if (BOARD.ocounter == BOARD.osum && BOARD.tcounter == (BOARD.tsum * 2) && BOARD.thcounter == (BOARD.thsum *3) && BOARD.fcounter == (BOARD.fsum * 4)) {
 	   }else{
 	  console.log("GENERATING RANDOM");
 	  startIndex = BOARD.generateStartIndex(boardSize, shotMap);
+	  console.log("in random");
+	  console.log(startIndex);
   	}
   }
   var arrayIndex = BOARD.checkIfArrayIsFull(shotMap);
@@ -131,14 +135,14 @@ BOARD.startAI = function(shotMap, boardSize, possibleShots){
 	BOARD.tcounter += 1;
       shotMap[startIndex] = shotResult;
 
-      if ((startIndex-1 >= 0 ) && (startIndex % boardSize != 0)&& (shotMap[startIndex-2] == 0 || shotMap[startIndex-2] == -1 || shotMap[startIndex-2] == null)) {
+      if ((startIndex-1 >= 0 ) && (startIndex % boardSize != 0) && (shotMap[startIndex-2] == 0 || shotMap[startIndex-2] == -1 || shotMap[startIndex-2] == null || (startIndex-1) % boardSize == 0)) {
 		if(shotMap[startIndex-1] == 0 || shotMap[startIndex-1] == -1 || shotMap[startIndex-1] == null)
 		{
 			possibleShots.push(startIndex-1);
 		}
       }
 
-      if (startIndex+1 < Math.pow(boardSize, 2) && (shotMap[startIndex+2] == 0 || shotMap[startIndex+2] == -1 || shotMap[startIndex-2] == null)) {
+      if (startIndex+1 < Math.pow(boardSize, 2) && (shotMap[startIndex+2] == 0 || shotMap[startIndex+2] == null || shotMap[startIndex-2] == null || shotMap[startIndex-2] == 0 ||  (startIndex+1) % boardSize  == 7 || startIndex % boardSize == 0)) {
 		if (shotMap[startIndex+1] == 0 || shotMap[startIndex+1] == -1 ||  shotMap[startIndex+1] == null) {
 			possibleShots.push(startIndex+1);
 		}
@@ -162,7 +166,7 @@ BOARD.startAI = function(shotMap, boardSize, possibleShots){
 
       document.getElementById(startIndex).classList.add('two-ship');
 
-	if(shotMap[startIndex +1] == 2 || shotMap[startIndex -1] == 2 || shotMap[startIndex - boardSize] ==2 || shotMap[+startIndex + +boardSize] == 2)
+	if(shotMap[startIndex +1] == 2 || shotMap[startIndex -1] == 2 || shotMap[startIndex - boardSize] == 2 || shotMap[+startIndex + +boardSize] == 2)
 	{
 		possibleShots = [];
 	}
@@ -173,7 +177,7 @@ BOARD.startAI = function(shotMap, boardSize, possibleShots){
       shotMap[startIndex] = shotResult;
 	document.getElementById(startIndex).classList.add('three-ship');
 	//setTimeout(function(){BOARD.startAI(shotMap, boardSize, possibleShots);}, BOARD.delay);
-      if ((startIndex-1 >= 0 ) && (startIndex % boardSize != 0)&& (shotMap[startIndex-2] == 0 || shotMap[startIndex-2] == -1 || shotMap[startIndex-2] == null || shotMap[startIndex-2] == 3)) {
+      if ((startIndex-1 >= 0 ) && (startIndex % boardSize != 0)&& (shotMap[startIndex-2] == 0 || shotMap[startIndex-2] == -1 || shotMap[startIndex-2] == null || shotMap[startIndex-2] == 3 || (startIndex-1) % boardSize == 0)) {
 		if(shotMap[startIndex-1] == 0 || shotMap[startIndex-1] == -1 || shotMap[startIndex-1] == null)
 		{
 			possibleShots.push(startIndex-1);
@@ -181,7 +185,7 @@ BOARD.startAI = function(shotMap, boardSize, possibleShots){
 		}
       }
 
-      if (startIndex+1 < (Math.pow(boardSize, 2)) && (shotMap[startIndex+2] == 0 || shotMap[startIndex+2] == -1 || shotMap[startIndex-2] == null || shotMap[startIndex-2] == 3)) {
+      if (startIndex+1 < (Math.pow(boardSize, 2)) && (shotMap[startIndex+2] == 0 || shotMap[startIndex+2] == -1|| (startIndex -2 ) % boardSize == 7 || shotMap[startIndex-2] == null || shotMap[startIndex-2] == 3 || (startIndex+1) % boardSize  == 7)) {
 		if (shotMap[startIndex+1] == 0 || shotMap[startIndex+1] == -1 ||  shotMap[startIndex+1] == null) {
 			possibleShots.push(startIndex+1);
 			console.log("+1");
@@ -217,6 +221,7 @@ BOARD.startAI = function(shotMap, boardSize, possibleShots){
 	}
 
 	if(shotMap[startIndex -1] == 3){
+		possibleShots = [];
 		if (startIndex <  (Math.pow(boardSize, 2) )) {
 			possibleShots.push(startIndex +1);
 		}
@@ -238,6 +243,7 @@ BOARD.startAI = function(shotMap, boardSize, possibleShots){
 	}
 
 	if(shotMap[startIndex - boardSize] == 3){
+		possibleShots = [];
 		if ((+startIndex + +boardSize) <  (Math.pow(boardSize, 2) -1)) {
 			possibleShots.push(+startIndex + +boardSize);
 		}
@@ -398,40 +404,95 @@ BOARD.takeTheShot = function(shotIndex) {
 BOARD.generateStartIndex = function(boardSize, shotMap) {
   var random =  Math.floor(Math.random() * Math.pow(boardSize,2));
   var i =  0
-  while(shotMap[random] != null || shotMap[+random + 1] > 0 || shotMap[+random - 1]  > 0 || shotMap[+random + +boardSize] > 0 || shotMap[+random - +boardSize] > 0 ||
-  shotMap[+random + +boardSize +1]  > 0 || shotMap[+random + +boardSize -1]  > 0 || shotMap[+random - +boardSize +1]  > 0 || shotMap[+random - +boardSize -1]  > 0 || i < 10)
+  //|| shotMap[+random + +boardSize +1]  > 0 || shotMap[+random + +boardSize -1]  > 0 || shotMap[+random - +boardSize +1]  > 0 || shotMap[+random - +boardSize -1]  > 0 || shotMap[+random + +boardSize] > 0 || shotMap[random - boardSize] > 0
+  while(shotMap[random] != null || ((random +1 ) % boardSize != 7 && shotMap[random + 1]  > 0) || ((random) % boardSize != 0  && shotMap[random - 1]  > 0) || shotMap[random - boardSize] > 0 || shotMap[+random + +boardSize] > 0  || i < 10)
   {
-	console.log('CREATING NEW RANDOM NUMBER ');
-	i++;
-	random =  Math.floor(Math.random() * Math.pow(boardSize,2));
-  }
+			console.log('CREATING NEW RANDOM NUMBER ');
+			i++;
+			random =  Math.floor(Math.random() * Math.pow(boardSize,2));
+}
 	  return random;
 }
 
 BOARD.generateShips = function(boardSize) {
   var shipMap = []
-  if(boardSize == 4)
-  {
-    shipMap = [
-      2,2,0,1,
-      0,0,0,0,
-      2,0,2,0,
-      2,0,2,0
-    ];
-  }
-
   if(boardSize == 8)
   {
-    shipMap = [
-	2,2,0,1,0,0,0,0,
-	0,0,0,0,0,0,2,0,
-	4,4,4,4,0,0,2,0,
-	0,0,0,0,0,0,0,0,
-	1,0,2,0,1,0,0,0,
-	0,0,2,0,0,0,3,0,
-	0,0,0,0,1,0,3,0,
-	3,3,3,0,0,0,3,0,
-    ];
+    var random = Math.floor(Math.random() * 5) + 1;
+    switch (random) {
+    	case 1:
+		shipMap = [
+		2,2,0,1,0,0,0,0,
+		0,0,0,0,0,0,2,0,
+		4,4,4,4,0,0,2,0,
+		0,0,0,0,0,0,0,0,
+		1,0,2,0,1,0,0,0,
+		0,0,2,0,0,0,3,0,
+		0,0,0,0,1,0,3,0,
+		3,3,3,0,0,0,3,0,
+		];
+    		break;
+	case 2:
+		shipMap = [
+		1,0,2,2,0,0,0,1,
+		0,0,0,0,0,0,0,0,
+		4,0,0,2,2,0,0,3,
+		4,0,0,0,0,0,0,3,
+		4,0,0,2,0,0,0,3,
+		4,0,0,2,0,0,0,0,
+		0,0,0,0,0,0,0,0,
+		1,0,0,3,3,3,0,1,
+		];
+    		break;
+	case 3:
+		shipMap = [
+		4,4,4,4,0,3,3,3,
+		0,0,0,0,0,0,0,0,
+		1,0,1,0,0,0,0,1,
+		0,0,0,0,0,3,0,0,
+		2,2,0,1,0,3,0,0,
+		0,0,0,0,0,3,0,0,
+		0,2,0,0,0,0,0,0,
+		0,2,0,2,2,0,0,0,
+		];
+    		break;
+	case 4:
+		shipMap = [
+		4,0,0,0,0,0,0,0,
+		4,0,0,0,0,1,0,0,
+		4,0,1,0,0,0,0,0,
+		4,0,0,0,2,2,0,0,
+		0,0,0,0,0,0,0,2,
+		0,3,3,3,0,1,0,2,
+		0,0,0,0,0,0,0,0,
+		3,3,3,0,2,2,0,1,
+		];
+		break;
+	case 5:
+		shipMap = [
+		0,0,0,0,0,0,1,0,
+		0,4,4,4,4,0,0,0,
+		0,0,0,0,0,0,0,1,
+		2,2,0,0,3,0,0,0,
+		0,0,0,0,3,0,1,0,
+		3,3,3,0,3,0,0,0,
+		0,0,0,0,0,0,2,0,
+		0,2,2,0,1,0,2,0,
+		];
+		break;
+    	default:
+		shipMap = [
+		0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,
+		];
+
+    }
   }
   return shipMap;
 }
