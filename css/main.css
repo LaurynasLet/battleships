@@ -8,9 +8,6 @@ html, body {
 	width: 80%;
 	margin: 0 auto;
 }
-.log {
-	width: 100%;
-}
 .board-container {
 	width: 100%;
 	padding: 16px;
@@ -41,7 +38,10 @@ html, body {
 .board-size {
 	width: 100%;
 }
-
+.log {
+	width: 100%;
+	display: block;
+}
 .button-generate {
 	width: 50%;
 	margin-top: 15px;
